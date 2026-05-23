@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Trailer - TrailersBliss LK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .video-container {
+            width: 85%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            background: #111;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.3);
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .back-btn {
+            margin-top: 25px;
+            background-color: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.4);
+        }
+        .back-btn:hover {
+            background-color: #e6b800;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 204, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container" id="videoContainer">
+        </div>
+
+    <a href="trailersbliss-lk.html" class="back-btn">⬅ Back to Home</a>
+
+    <script>
+        // 1. URL එකේ තියෙන වීඩියෝ ID එක අල්ලගන්නවා
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        const container = document.getElementById('videoContainer');
+
+        if (videoId) {
+            // 2. ID එක තියෙනවා නම් යූටියුබ් ප්ලේයර් එක ඔටෝ ප්ලේ වෙන්න හදනවා (Mute කරලා)
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+            // ID එකක් නැත්නම් Error එකක් පෙන්වනවා
+            container.innerHTML = `<h3 style="text-align:center; margin-top: 25%; color: #ffcc00;">Video Not Found 😢</h3>`;
+        }
+    </script>
+</body>
+</html>
