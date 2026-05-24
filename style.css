@@ -134,7 +134,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px;
+    padding: 0 8px; /* අයිකන් දෙක දෙපැත්තට ලස්සනට සෙට් වෙන්න padding හැදුවා */
     position: relative;
     height: 30px;
     width: 60px;
@@ -163,16 +163,20 @@ html {
     z-index: 2;
 }
 
-/* Button එක Click කරාම බෝලේ දකුණට යන කේතය (මේක තමයි වැදගත්ම) */
-.theme-btn.active .ball {
-    transform: translateX(30px);
-}
-[data-theme="light"] .theme-btn .ball {
-    background-color: #ff9800;
+/* ===================================================
+   FIXED TOGGLE LOGIC (රාහුල ප්‍රොජෙක්ට් එක වෙනුවෙන් නිවැරදි කළ කොටස)
+   ===================================================
+*/
+
+/* Dark Mode එකේදී බෝලය වමට (0px) ගොස් ඉර වසා සඳ පෙන්වයි */
+[data-theme="dark"] .theme-btn .ball {
+    transform: translateX(0px) !important;
 }
 
-[data-theme="dark"] .theme-btn .ball {
-    transform: translateX(28px);
+/* Light Mode එකේදී බෝලය දකුණට (32px) ගොස් සඳ වසා ඉර පෙන්වයි */
+[data-theme="light"] .theme-btn .ball {
+    transform: translateX(32px) !important; /* බොත්තමේ පළල අනුව නූලටම සෙට් කර ඇත */
+    background-color: #ff9800;
 }
 
 /* Premium Hamburger Menu Button */
