@@ -10,13 +10,13 @@ import {
 
 // ඔයාගේ Firebase Config එක
 const firebaseConfig = {
-  apiKey: "AIzaSyDRPro7oeI4z3faIUGoqW_xLZGF2dH-PwA",
-  authDomain: "trailersbliss.firebaseapp.com",
-  projectId: "trailersbliss",
-  storageBucket: "trailersbliss.firebasestorage.app",
-  messagingSenderId: "363232415056",
-  appId: "1:363232415056:web:c832a34c61619c4e7a3055",
-  measurementId: "G-NSXBVWL28C"
+    apiKey: "AIzaSyDRPro7oeI4z3faIUGoqW_xLZGF2dH-PwA",
+    authDomain: "trailersbliss.firebaseapp.com",
+    projectId: "trailersbliss",
+    storageBucket: "trailersbliss.firebasestorage.app",
+    messagingSenderId: "363232415056",
+    appId: "1:363232415056:web:c832a34c61619c4e7a3055",
+    measurementId: "G-NSXBVWL28C"
 };
 
 // Firebase Initialize කිරීම
@@ -24,24 +24,90 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
+   
+    // =========================================
+    // PREMIUM PRELOADER TIMER LOGIC (EXACTLY 3 SECONDS)
+    // =========================================
+    const preloader = document.getElementById('custom-preloader');
+    
+    if (preloader) {
+        setTimeout(() => {
+            // තත්පර 3කට පසු 'fade-out' ක්ලාස් එක එකතු කර සුමටව අයින් කරයි
+            preloader.classList.add('fade-out');
+            
+            // ඇනිමේෂන් එක ඉවර වුණාම සම්පූර්ණයෙන්ම display: none කරයි (නැතහොත් ක්ලික් කරන්න බැරි වේ)
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 600); // CSS වල transition එකට තත්පර 0.6ක් දුන් නිසා මෙතනට 600ms යොදයි
+            
+        }, 3000); // 3000ms = හරියටම තත්පර 3ක් ලෝඩින් ස්ක්‍රීන් එක පෙන්වයි
+    }
+    
+    // ඔයාගේ පැරණි කෝඩ් එක (Category Filtering, Firebase Logic ආදිය) මෙතැන් සිට වෙනස් නොවී ක්‍රියාත්මක වේ...
+    // =========================================
+    // 1. CATEGORY FILTERING LOGIC
+    // =========================================
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // බොත්තම් වල පාට මාරු කිරීම
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
 
+            const selectedCategory = this.getAttribute('data-filter');
+            const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
+            
+            // ෆිල්ම් කාඩ් ෆිල්ටර් කිරීම
+            allMovieCards.forEach(card => {
+                if (selectedCategory === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    if (card.getAttribute('data-category') === selectedCategory) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+
+   // =========================================
+    // 2. THEME & ADMIN MODE CHECK
+    // =========================================
     if (sessionStorage.getItem('isAdmin') === 'true') {
         document.body.classList.add('admin-mode');
     }
     
     const themeToggle = document.getElementById('theme-toggle');
-    const htmlElement = document.documentElement;
-    
+    const htmlElement = document.documentElement; 
+
+    // මුලින්ම වෙබ්සයිට් එකට එද්දී Dark Mode එකෙන් පටන් ගන්න
+    if (!htmlElement.getAttribute('data-theme')) {
+        htmlElement.setAttribute('data-theme', 'dark'); 
+    }
+
     if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            if (htmlElement.getAttribute('data-theme') === 'dark') {
+        themeToggle.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            
+            // මේකෙන් තමයි CSS වලට සිග්නල් එක දෙන්නේ බෝලේ එහාට මෙහාට යවන්න කියලා!
+            this.classList.toggle('active');
+            
+            // Theme එක මාරු කරන කොටස
+            let currentTheme = htmlElement.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
                 htmlElement.setAttribute('data-theme', 'light');
             } else {
                 htmlElement.setAttribute('data-theme', 'dark');
             }
         });
     }
-
+    // =========================================
+    // 3. NAVBAR SCROLL EFFECT
+    // =========================================
     window.addEventListener('scroll', function() {
         const navbar = document.getElementById('mainNavbar');
         if (navbar) {
@@ -53,13 +119,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // =========================================
+    // 4. ADMIN LOGIN LOGIC
+    // =========================================
     const loginBtn = document.getElementById('loginBtn');
     const adminPasswordInput = document.getElementById('adminPassword');
     const loginError = document.getElementById('loginError');
-    const addTrailerForm = document.getElementById('addTrailerForm');
-    const dynamicTrailers = document.getElementById('dynamic-trailers');
-
-    loadTrailersFromFirebase();
 
     if (loginBtn) {
         loginBtn.addEventListener('click', function(e) {
@@ -95,35 +160,41 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // =========================================
+    // 5. ADD TRAILER TO FIREBASE (FORM SUBMIT)
+    // =========================================
+    const addTrailerForm = document.getElementById('addTrailerForm');
+    
     if (addTrailerForm) {
         addTrailerForm.addEventListener('submit', async function(e) {
             e.preventDefault(); 
 
+            // Form එකෙන් දත්ත ලබා ගැනීම (Category එකත් ඇතුලුව)
             const title = document.getElementById('movieTitle').value;
             const year = document.getElementById('movieYear').value;
             const image = document.getElementById('movieImage').value;
             const trailer = document.getElementById('movieTrailer').value;
+            const category = document.getElementById('movieCategory').value;
 
-            const newTrailer = { title, year, image, trailer };
+            // දත්ත එකතු කිරීම
+            const newTrailer = { title, year, image, trailer, category };
 
+            // Firebase එකට යැවීම
             const docId = await saveTrailerToFirebase(newTrailer);
 
             if (docId) {
                 addTrailerToUI(newTrailer, docId);
                 alert('Trailer Added Successfully! 🎉');
+                addTrailerForm.reset(); // ෆෝම් එක Clear කිරීම
             } else {
                 alert('දෝෂයක්! දත්ත එකතු කිරීමට නොහැකි විය.');
-            }
-
-            addTrailerForm.reset();
-            const dashboardModalEl = document.getElementById('adminDashboardModal');
-            if (dashboardModalEl) {
-                const dashboardModal = bootstrap.Modal.getInstance(dashboardModalEl);
-                if(dashboardModal) dashboardModal.hide();
             }
         });
     }
 
+    // =========================================
+    // 6. FIREBASE FUNCTIONS
+    // =========================================
     async function saveTrailerToFirebase(trailer) {
         try {
             const docRef = await addDoc(collection(db, "trailers"), trailer);
@@ -164,7 +235,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // යූටියුබ් ලින්ක් එකෙන් ID එක වෙන් කරගන්නා Function එක
+    // =========================================
+    // 7. YOUTUBE LINK EXTRACTION & UI UPDATE
+    // =========================================
     function getYouTubeVideoId(url) {
         let videoId = null;
         const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -175,19 +248,21 @@ document.addEventListener("DOMContentLoaded", function() {
         return videoId;
     }
 
-    // HTML එකට අලුත් Movie Card එකක් එකතු කරන Function එක
     function addTrailerToUI(trailer, docId) {
+        const dynamicTrailers = document.getElementById('dynamic-trailers');
         if (!dynamicTrailers) return;
 
         const colDiv = document.createElement('div');
         colDiv.className = 'col-6 col-md-4 col-lg-3 dynamic-movie-card';
         
-        // 1. යූටියුබ් ලින්ක් එකෙන් ID එක අරගන්නවා
+        // Category එක Set කිරීම (නැත්නම් 'Other' ලෙස දැමීම)
+        const movieCategory = trailer.category || 'Other'; 
+        colDiv.setAttribute('data-category', movieCategory);
+
         const videoId = getYouTubeVideoId(trailer.trailer);
-        
-        // 2. ID එක තියෙනවා නම් video.html එකට යවනවා, නැත්නම් සාමාන්‍ය ලින්ක් එකට යවනවා
         const targetLink = videoId ? `video.html?id=${videoId}` : trailer.trailer;
 
+        // UI එකට අදාල කෑල්ල (Category Badge එකත් එක්ක)
         colDiv.innerHTML = `
             <div class="movie-card-wrapper" style="position:relative;">
                 <button class="btn btn-danger btn-sm delete-btn" style="position:absolute; top:8px; right:8px; z-index:10; border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: bold; box-shadow: 0px 2px 5px rgba(0,0,0,0.5);">
@@ -196,7 +271,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <a href="${targetLink}" class="movie-card" target="_blank">
                     <div class="year-badge">${trailer.year}</div>
-                    <div class="sub-badge">SINHALA SUB</div>
+                    
+                    <!-- අලුත් Category Badge එක -->
+                    <div class="category-badge">${movieCategory}</div> 
+
+                    <div class="sub-badge">OFFICIAL TRAILER</div>
                     <img src="${trailer.image}" alt="Movie Poster">
                     <div class="movie-info">
                         <h5 class="movie-title">${trailer.title}</h5>
@@ -205,9 +284,10 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
         
+        // අලුත් ෆිල්ම් එක මුලින්ම පෙන්වන්න prepend කිරීම
         dynamicTrailers.prepend(colDiv);
 
-        // Delete බොත්තම ක්‍රියාත්මක වීම
+        // Delete Button ක්‍රියාකාරීත්වය
         const deleteBtn = colDiv.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', function(e) {
             e.preventDefault(); 
@@ -215,4 +295,8 @@ document.addEventListener("DOMContentLoaded", function() {
             deleteTrailerFromFirebase(docId, colDiv);
         });
     }
-});
+
+    // අවසානයේ ෆිල්ම් ටික Firebase එකෙන් ලෝඩ් කිරීම පටන් ගන්නවා
+    loadTrailersFromFirebase();
+
+}); // මෙතනින් DOMContentLoaded එක ඉවර වෙනවා

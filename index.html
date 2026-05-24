@@ -9,7 +9,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+    <div id="custom-preloader">
+    <div class="preloader-content">
+        <div class="premium-spinner"></div>
+        <h1 class="preloader-logo">TrailersBliss <span class="accent-text">LK</span></h1>
+    </div>
+</div>
     <nav id="mainNavbar" class="navbar sticky-top">
         <div class="container d-flex align-items-center">
             
@@ -49,7 +54,16 @@
             <h2 class="text-start fw-bold mb-4 px-2 section-main-title">
                 <i class="fas fa-bolt" style="color: #ffcc00;"></i> LATEST TRAILERS
             </h2>
-            
+            <!-- Category Filter Buttons (අලුතින් එකතු කළ කොටස) -->
+            <div class="category-filters-container mb-4">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="Action">Action</button>
+                <button class="filter-btn" data-filter="Horror">Horror</button>
+                <button class="filter-btn" data-filter="Sci-Fi">Sci-Fi</button>
+                <button class="filter-btn" data-filter="Comedy">Comedy</button>
+                <button class="filter-btn" data-filter="Drama">Drama</button>
+                <button class="filter-btn" data-filter="TV Shows">TV Shows</button>
+            </div>
             <div class="row g-3" id="dynamic-trailers">
                 
             </div>
@@ -161,7 +175,19 @@
                                 <input type="url" id="movieTrailer" class="form-control bg-dark text-white border-secondary" required placeholder="https://youtube.com/...">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-upload me-2"></i> Publish Trailer</button>
+                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-upload me-2"></i><!-- Category Select (අලුතින් එකතු කළ කොටස) -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Category</label>
+                                <select id="movieCategory" class="form-control bg-dark text-white border-secondary" required>
+                                    <option value="" disabled selected>Select Movie Category</option>
+                                    <option value="Action">Action</option>
+                                    <option value="Horror">Horror</option>
+                                    <option value="Sci-Fi">Sci-Fi</option>
+                                    <option value="Comedy">Comedy</option>
+                                    <option value="Drama">Drama</option>
+                                </select>
+                            </div>
+Publish Trailer</button>
                     </form>
                 </div>
             </div>
