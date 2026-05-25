@@ -25,11 +25,13 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
    
+    // Global Array (සර්ච් එකට ෆිල්ම් ටික අල්ලගන්න)
+    window.allTrailersData = [];
+
     // =========================================
-    // PREMIUM PRELOADER TIMER LOGIC (EXACTLY 3 SECONDS)
+    // PREMIUM PRELOADER TIMER LOGIC
     // =========================================
     const preloader = document.getElementById('custom-preloader');
-    
     if (preloader) {
         setTimeout(() => {
             preloader.classList.add('fade-out');
@@ -43,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // 1. CATEGORY FILTERING LOGIC
     // =========================================
     const filterBtns = document.querySelectorAll('.filter-btn');
-    
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -84,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function() {
         themeToggle.addEventListener('click', function(e) {
             e.preventDefault(); 
             this.classList.toggle('active');
-            
             let currentTheme = htmlElement.getAttribute('data-theme');
             if (currentTheme === 'dark') {
                 htmlElement.setAttribute('data-theme', 'light');
@@ -122,7 +122,6 @@ document.addEventListener("DOMContentLoaded", function() {
             
             if (password === 'adminyenuka') { 
                 if(loginError) loginError.classList.add('d-none');
-                
                 sessionStorage.setItem('isAdmin', 'true');
                 document.body.classList.add('admin-mode');
                 
@@ -131,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     const loginModal = bootstrap.Modal.getInstance(loginModalEl) || new bootstrap.Modal(loginModalEl);
                     loginModal.hide();
                 }
-                
                 if(adminPasswordInput) adminPasswordInput.value = '';
 
                 setTimeout(() => {
@@ -141,7 +139,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         dashboardModal.show();
                     }
                 }, 400);
-                
             } else {
                 if(loginError) loginError.classList.remove('d-none');
             }
@@ -149,28 +146,27 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // =========================================
-    // 5. ADD TRAILER TO FIREBASE (FORM SUBMIT)
+    // 5. ADD TRAILER TO FIREBASE
     // =========================================
     const addTrailerForm = document.getElementById('addTrailerForm');
-    
     if (addTrailerForm) {
         addTrailerForm.addEventListener('submit', async function(e) {
             e.preventDefault(); 
-
             const title = document.getElementById('movieTitle').value;
             const year = document.getElementById('movieYear').value;
             const image = document.getElementById('movieImage').value;
             const trailer = document.getElementById('movieTrailer').value;
             const category = document.getElementById('movieCategory').value;
 
-            // අලුතින් දාන ඒවට වර්තමාන වේලාව (Date.now) එකතු කරනවා
             const newTrailer = { title, year, image, trailer, category, createdAt: Date.now() };
-
             const docId = await saveTrailerToFirebase(newTrailer);
 
             if (docId) {
-                // true කියන එකෙන් අලුත් ෆිල්ම් එකක් බව අඳුරගෙන ඒක උඩින්ම දානවා
-                addTrailerToUI(newTrailer, docId, true); 
+                addTrailerToUI(newTrailer, docId, true);
+                
+                // අලුතින් දාන එකත් Search ලැයිස්තුවට එකතු කරනවා
+                window.allTrailersData.unshift({ id: docId, data: newTrailer });
+
                 alert('Trailer Added Successfully! 🎉');
                 addTrailerForm.reset(); 
             } else {
@@ -192,32 +188,25 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // මෙතන තමයි සේෆ් විදිහට Sorting කරන තැන
     async function loadTrailersFromFirebase() {
         try {
-            // කිසිම Sorting නීතියක් නැතුව Firebase එකෙන් ඔක්කොම ඩේටා ඉල්ලනවා
             const querySnapshot = await getDocs(collection(db, "trailers"));
-            
             let trailersArray = [];
 
-            // ආපු ඩේටා ටික Array එකකට දාගන්නවා
             querySnapshot.forEach((doc) => {
                 let data = doc.data();
-                // පරණ 20ට "createdAt" නැති නිසා, ඒවට 0 දීලා අඩුවක් නැතිව තියාගන්නවා
                 if (!data.createdAt) {
-                    data.createdAt = 0;
+                    data.createdAt = 0; // පරණ 20 සේෆ්!
                 }
                 trailersArray.push({ id: doc.id, data: data });
             });
 
-            // Browser එක ඇතුළෙදි වෙලාව අනුව පිළිවෙළ හදනවා (අලුත්ම ඒවා උඩට එන්න)
             trailersArray.sort((a, b) => b.data.createdAt - a.data.createdAt);
+            window.allTrailersData = trailersArray; // Search එකට ඩේටා ටික දෙනවා
 
-            // පිළිවෙළ හදපු ලිස්ට් එක පේජ් එකට දානවා
             trailersArray.forEach((item) => {
                 addTrailerToUI(item.data, item.id, false);
             });
-
         } catch (e) {
             console.error("Error loading trailers: ", e);
         }
@@ -229,11 +218,14 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("අවසර නැත! මෙම ක්‍රියාව සිදුකළ හැක්කේ ඇඩ්මින්වරයෙකුට පමණි.");
             return;
         }
-
         if (confirm("ඔබට විශ්වාසද මෙම ට්‍රේලර් එක මකා දැමිය යුතුයි කියා?")) {
             try {
                 await deleteDoc(doc(db, "trailers", docId));
                 elementToRemove.remove(); 
+                
+                // මැකුවම Search ලිස්ට් එකෙනුත් අයින් කරනවා
+                window.allTrailersData = window.allTrailersData.filter(item => item.id !== docId);
+
                 alert("Trailer Deleted Successfully! 🗑️");
             } catch (e) {
                 console.error("Error deleting document: ", e);
@@ -242,9 +234,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // =========================================
-    // 7. YOUTUBE LINK EXTRACTION & UI UPDATE
-    // =========================================
     function getYouTubeVideoId(url) {
         let videoId = null;
         const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -255,14 +244,12 @@ document.addEventListener("DOMContentLoaded", function() {
         return videoId;
     }
 
-    // අලුත් ට්‍රේලර් උඩින්ම දාන්න isNew පැරාමීටරය පාවිච්චි කරනවා
     function addTrailerToUI(trailer, docId, isNew = false) {
         const dynamicTrailers = document.getElementById('dynamic-trailers');
         if (!dynamicTrailers) return;
 
         const colDiv = document.createElement('div');
         colDiv.className = 'col-6 col-md-4 col-lg-3 dynamic-movie-card';
-        
         const movieCategory = trailer.category || 'Other'; 
         colDiv.setAttribute('data-category', movieCategory);
 
@@ -274,7 +261,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 <button class="btn btn-danger btn-sm delete-btn" style="position:absolute; top:8px; right:8px; z-index:10; border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: bold; box-shadow: 0px 2px 5px rgba(0,0,0,0.5);">
                     <i class="fas fa-trash"></i> Delete
                 </button>
-
                 <a href="${targetLink}" class="movie-card" target="_blank">
                     <div class="year-badge">${trailer.year}</div>
                     <div class="category-badge">${movieCategory}</div> 
@@ -287,19 +273,101 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
         
-        // අලුත් එකක් නම් (isNew = true) ලිස්ට් එකේ උඩින්ම (prepend) දානවා
         if (isNew) {
             dynamicTrailers.prepend(colDiv);
         } else {
-            dynamicTrailers.append(colDiv); // අනිත් ඔක්කොම පිළිවෙළට යටින් එකතු වෙනවා
+            dynamicTrailers.append(colDiv); 
         }
 
-        // Delete Button ක්‍රියාකාරීත්වය
         const deleteBtn = colDiv.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', function(e) {
             e.preventDefault(); 
             e.stopPropagation(); 
             deleteTrailerFromFirebase(docId, colDiv);
+        });
+    }
+
+    // =========================================
+    // 7. NEW SEARCH BAR LOGIC (LIVE SUGGESTIONS & ENTER KEY)
+    // =========================================
+    const searchBox = document.getElementById('movieSearchBox');
+    const suggestionsBox = document.getElementById('searchSuggestions');
+
+    if (searchBox && suggestionsBox) {
+        
+        // අකුරක් ගහද්දි Live පින්තූරයයි නමයි එන කෑල්ල
+        searchBox.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            suggestionsBox.innerHTML = ''; 
+
+            if (query === '') {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            // අකුරට ගැලපෙන ෆිල්ම් හොයනවා
+            const matchedMovies = window.allTrailersData.filter(item =>
+                item.data.title.toLowerCase().includes(query)
+            );
+
+            if (matchedMovies.length > 0) {
+                suggestionsBox.style.display = 'flex';
+                matchedMovies.forEach(movie => {
+                    const videoId = getYouTubeVideoId(movie.data.trailer);
+                    const targetLink = videoId ? `video.html?id=${videoId}` : movie.data.trailer;
+
+                    const itemDiv = document.createElement('a');
+                    itemDiv.href = targetLink;
+                    itemDiv.target = "_blank"; // අලුත් ටැබ් එකක ඕපන් වෙන්න
+                    itemDiv.className = 'search-suggestion-item';
+                    
+                    // පින්තූරය සහ නම තීරුවක් විදිහට හැදෙනවා
+                    itemDiv.innerHTML = `
+                        <img src="${movie.data.image}" alt="${movie.data.title}">
+                        <span>${movie.data.title}</span>
+                    `;
+                    
+                    suggestionsBox.appendChild(itemDiv);
+                });
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Enter ඔබද්දි මුළු සයිට් එකේම ෆිල්ම් ෆිල්ටර් වෙන කෑල්ල
+        searchBox.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = this.value.toLowerCase().trim();
+                suggestionsBox.style.display = 'none'; // Dropdown එක හංගනවා
+
+                const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
+                let foundAny = false;
+
+                allMovieCards.forEach(card => {
+                    const title = card.querySelector('.movie-title').textContent.toLowerCase();
+                    if (title.includes(query)) {
+                        card.style.display = 'block';
+                        foundAny = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // "All" Button එක Active කරනවා ෆිල්ටර් වෙද්දි Category අවුල් නොයන්න
+                const allFilterBtn = document.querySelector('.filter-btn[data-filter="all"]');
+                if(allFilterBtn) {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    allFilterBtn.classList.add('active');
+                }
+            }
+        });
+
+        // වෙන තැනක් ක්ලික් කරද්දි Dropdown එක හංගනවා
+        document.addEventListener('click', function(e) {
+            if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
         });
     }
 

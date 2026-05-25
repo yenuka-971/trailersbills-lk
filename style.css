@@ -509,4 +509,68 @@ body.admin-mode .delete-btn {
 @keyframes pulseText {
     0%, 100% { opacity: 0.8; transform: scale(0.98); }
     50% { opacity: 1; transform: scale(1); }
+}/* ========================================= */
+/* PREMIUM SEARCH BAR STYLES                 */
+/* ========================================= */
+#movieSearchBox {
+    width: 100%;
+    padding: 14px 25px;
+    font-size: 16px;
+    background-color: #000000 !important; /* ඇතුළ කළු */
+    color: #ffffff !important;            /* අකුරු සුදු */
+    border: 2px solid #ffffff;            /* වටේට සුදු රාමුව */
+    border-radius: 30px;
+    outline: none;
+    transition: 0.3s ease-in-out;
+}
+#movieSearchBox::placeholder {
+    color: #bbbbbb;
+}
+#movieSearchBox:focus {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* Search Suggestions Box (පින්තූරය සහ නම පෙන්වන තීරුව) */
+.search-suggestions-dropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background-color: #111111;
+    border: 1px solid #ffffff;
+    border-radius: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    display: none; /* මුලින් හැංගිලා තියෙන්නේ */
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.9);
+}
+
+.search-suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #333333;
+    cursor: pointer;
+    text-decoration: none;
+    color: #ffffff;
+    transition: background 0.2s;
+}
+.search-suggestion-item:last-child {
+    border-bottom: none;
+}
+.search-suggestion-item:hover {
+    background-color: #2a2a2a;
+    color: #ffc107; /* කහ පාට (Hover වෙද්දි) */
+}
+.search-suggestion-item img {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 15px;
+}
+.search-suggestion-item span {
+    font-size: 16px;
+    font-weight: bold;
 }
