@@ -5,9 +5,7 @@ import {
     addDoc, 
     getDocs,
     deleteDoc, 
-    doc,
-    query,      // <--- අලුතින් එකතු කළා (Sorting සඳහා)
-    orderBy     // <--- අලුතින් එකතු කළා (Sorting සඳහා)   
+    doc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ඔයාගේ Firebase Config එක
@@ -165,14 +163,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const trailer = document.getElementById('movieTrailer').value;
             const category = document.getElementById('movieCategory').value;
 
-            // සාර්ථකව Sort කිරීම සඳහා "createdAt" නමින් වර්තමාන Timestamp එකක් එකතු කළා
-            const newTrailer = { title, year, image, trailer, category, createdAt: Date.now() };
+            // සරලම විදිහට Trailer Object එක හදනවා (කිසිම අලුත් දෙයක් නෑ)
+            const newTrailer = { title, year, image, trailer, category };
 
             const docId = await saveTrailerToFirebase(newTrailer);
 
             if (docId) {
-                // 'true' මඟින් කියවෙන්නේ අලුතින්ම දාපු එක ක්ෂණිකව උඩින්ම පෙන්වන්න කියන එකයි
-                addTrailerToUI(newTrailer, docId, true); 
+                // අලුත් එක යටින්ම පෙන්නයි, හැබැයි පරණ 20 බේරෙයි
+                addTrailerToUI(newTrailer, docId); 
                 alert('Trailer Added Successfully! 🎉');
                 addTrailerForm.reset(); 
             } else {
@@ -194,16 +192,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // මෙතන තමා වෙනස. කිසිම Sorting එකක් නැතුව, තියෙන දේවල් නිකන්ම ගන්නවා.
     async function loadTrailersFromFirebase() {
         try {
-            const trailersRef = collection(db, "trailers");
-            // අලුත්ම දේවල් මුලට එන විදිහට query එක සකස් කළා
-            const q = query(trailersRef, orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await getDocs(collection(db, "trailers"));
             
             querySnapshot.forEach((doc) => {
-                // 'false' යොදන්නේ පරණ ඒවා පිළිවෙලට ලෝඩ් වෙන්නයි
-                addTrailerToUI(doc.data(), doc.id, false);
+                addTrailerToUI(doc.data(), doc.id);
             });
         } catch (e) {
             console.error("Error loading trailers: ", e);
@@ -242,8 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return videoId;
     }
 
-    // isNew කියන පැරාමීටරය අලුතින්ම එකතු කළා
-    function addTrailerToUI(trailer, docId, isNew = false) {
+    function addTrailerToUI(trailer, docId) {
         const dynamicTrailers = document.getElementById('dynamic-trailers');
         if (!dynamicTrailers) return;
 
@@ -274,12 +268,8 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
         
-        // මෙන්න මෙතනයි වෙනස වුණේ:
-        if (isNew) {
-            dynamicTrailers.prepend(colDiv); // ෆෝම් එකෙන් අලුතින්ම දාන එක ක්ෂණිකව උඩින්ම පෙන්වන්න
-        } else {
-            dynamicTrailers.append(colDiv);  // ඩේටාබේස් එකෙන් එන ඒවා පිළිවෙලට පහළට එකතු වෙන්න
-        }
+        // හැම එකම පරණ විදිහට අගට එකතු වෙනවා
+        dynamicTrailers.append(colDiv);  
 
         // Delete Button ක්‍රියාකාරීත්වය
         const deleteBtn = colDiv.querySelector('.delete-btn');
