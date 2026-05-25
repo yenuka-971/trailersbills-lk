@@ -25,25 +25,8 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
    
-    // =========================================
-    // PREMIUM PRELOADER TIMER LOGIC (EXACTLY 3 SECONDS)
-    // =========================================
-    const preloader = document.getElementById('custom-preloader');
     
-    if (preloader) {
-        setTimeout(() => {
-            // තත්පර 3කට පසු 'fade-out' ක්ලාස් එක එකතු කර සුමටව අයින් කරයි
-            preloader.classList.add('fade-out');
-            
-            // ඇනිමේෂන් එක ඉවර වුණාම සම්පූර්ණයෙන්ම display: none කරයි (නැතහොත් ක්ලික් කරන්න බැරි වේ)
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 600); // CSS වල transition එකට තත්පර 0.6ක් දුන් නිසා මෙතනට 600ms යොදයි
-            
-        }, 3000); // 3000ms = හරියටම තත්පර 3ක් ලෝඩින් ස්ක්‍රීන් එක පෙන්වයි
-    }
-    
-    // =========================================
+}); // =========================================
     // 1. CATEGORY FILTERING LOGIC
     // =========================================
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -162,3 +145,21 @@ document.addEventListener("DOMContentLoaded", function() {
     // =========================================
     // 5. ADD TRAILER TO FIREBASE (FORM SUBMIT)
     // =========================================
+/* =========================================
+   PRELOADER HIDE LOGIC (FINAL FIX)
+   ========================================= */
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('custom-preloader');
+    
+    // තත්පර 3ක් ලෝඩ් වෙන්න දීලා අයින් කරන්න
+    setTimeout(function() {
+        if (preloader) {
+            preloader.classList.add('fade-out');
+            
+            // CSS transition එක ඉවර වෙන්න 0.6s ඉන්නවා
+            setTimeout(function() {
+                preloader.style.display = 'none';
+            }, 600); 
+        }
+    }, 3000); 
+});
