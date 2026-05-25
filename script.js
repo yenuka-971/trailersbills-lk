@@ -1,14 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    getDocs,
-    deleteDoc, 
-    doc         
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ඔයාගේ Firebase Config එක
 const firebaseConfig = {
     apiKey: "AIzaSyDRPro7oeI4z3faIUGoqW_xLZGF2dH-PwA",
     authDomain: "trailersbliss.firebaseapp.com",
@@ -19,147 +11,69 @@ const firebaseConfig = {
     measurementId: "G-NSXBVWL28C"
 };
 
-// Firebase Initialize කිරීම
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Preloader & Main Logic
 document.addEventListener("DOMContentLoaded", function() {
-   
     
-}); // =========================================
-    // 1. CATEGORY FILTERING LOGIC
-    // =========================================
+    // 1. Preloader Logic
+    const preloader = document.getElementById('custom-preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+            setTimeout(() => { preloader.style.display = 'none'; }, 600);
+        }, 3000);
+    }
+
+    // 2. Load Trailers from Firebase
+    async function loadTrailers() {
+        const container = document.getElementById('trailers-container');
+        if (!container) return; // container එක නැත්නම් වැඩේ නතර කරනවා
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "trailers"));
+            container.innerHTML = ''; 
+
+            querySnapshot.forEach((doc) => {
+                const movie = doc.data();
+                const cardHTML = `
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4 dynamic-movie-card" data-category="${movie.category}">
+                        <a href="${movie.trailer}" target="_blank" class="movie-card">
+                            <img src="${movie.image}" alt="${movie.title}">
+                            <div class="year-badge">${movie.year}</div>
+                            <div class="category-badge">${movie.category}</div>
+                            <div class="movie-info">
+                                <h5 class="movie-title">${movie.title}</h5>
+                            </div>
+                        </a>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        } catch (error) {
+            console.error("Error loading trailers: ", error);
+        }
+    }
+
+    loadTrailers();
+
+    // 3. Category Filter Logic
     const filterBtns = document.querySelectorAll('.filter-btn');
-    
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            // බොත්තම් වල පාට මාරු කිරීම
             filterBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-
             const selectedCategory = this.getAttribute('data-filter');
             const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
             
-            // ෆිල්ම් කාඩ් ෆිල්ටර් කිරීම
             allMovieCards.forEach(card => {
-                if (selectedCategory === 'all') {
+                if (selectedCategory === 'all' || card.getAttribute('data-category') === selectedCategory) {
                     card.style.display = 'block';
                 } else {
-                    if (card.getAttribute('data-category') === selectedCategory) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = 'none';
                 }
             });
         });
     });
-
-   // =========================================
-    // 2. THEME & ADMIN MODE CHECK
-    // =========================================
-    if (sessionStorage.getItem('isAdmin') === 'true') {
-        document.body.classList.add('admin-mode');
-    }
-    
-    const themeToggle = document.getElementById('theme-toggle');
-    const htmlElement = document.documentElement; 
-
-    // මුලින්ම වෙබ්සයිට් එකට එද්දී Dark Mode එකෙන් පටන් ගන්න
-    if (!htmlElement.getAttribute('data-theme')) {
-        htmlElement.setAttribute('data-theme', 'dark'); 
-    }
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            
-            // මේකෙන් තමයි CSS වලට සිග්නල් එක දෙන්නේ බෝලේ එහාට මෙහාට යවන්න කියලා!
-            this.classList.toggle('active');
-            
-            // Theme එක මාරු කරන කොටස
-            let currentTheme = htmlElement.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                htmlElement.setAttribute('data-theme', 'light');
-            } else {
-                htmlElement.setAttribute('data-theme', 'dark');
-            }
-        });
-    }
-    // =========================================
-    // 3. NAVBAR SCROLL EFFECT
-    // =========================================
-    window.addEventListener('scroll', function() {
-        const navbar = document.getElementById('mainNavbar');
-        if (navbar) {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        }
-    });
-
-    // =========================================
-    // 4. ADMIN LOGIN LOGIC
-    // =========================================
-    const loginBtn = document.getElementById('loginBtn');
-    const adminPasswordInput = document.getElementById('adminPassword');
-    const loginError = document.getElementById('loginError');
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            
-            const password = adminPasswordInput.value;
-            
-            if (password === 'adminyenuka') { 
-                if(loginError) loginError.classList.add('d-none');
-                
-                sessionStorage.setItem('isAdmin', 'true');
-                document.body.classList.add('admin-mode');
-                
-                const loginModalEl = document.getElementById('adminLoginModal');
-                if (loginModalEl) {
-                    const loginModal = bootstrap.Modal.getInstance(loginModalEl) || new bootstrap.Modal(loginModalEl);
-                    loginModal.hide();
-                }
-                
-                if(adminPasswordInput) adminPasswordInput.value = '';
-
-                setTimeout(() => {
-                    const dashboardModalEl = document.getElementById('adminDashboardModal');
-                    if (dashboardModalEl) {
-                        const dashboardModal = bootstrap.Modal.getInstance(dashboardModalEl) || new bootstrap.Modal(dashboardModalEl);
-                        dashboardModal.show();
-                    }
-                }, 400);
-                
-            } else {
-                if(loginError) loginError.classList.remove('d-none');
-            }
-        });
-    }
-
-    // =========================================
-    // 5. ADD TRAILER TO FIREBASE (FORM SUBMIT)
-    // =========================================
-/* =========================================
-   PRELOADER HIDE LOGIC (FINAL FIX)
-   ========================================= */
-window.addEventListener('load', function() {
-    const preloader = document.getElementById('custom-preloader');
-    
-    // තත්පර 3ක් ලෝඩ් වෙන්න දීලා අයින් කරන්න
-    setTimeout(function() {
-        if (preloader) {
-            preloader.classList.add('fade-out');
-            
-            // CSS transition එක ඉවර වෙන්න 0.6s ඉන්නවා
-            setTimeout(function() {
-                preloader.style.display = 'none';
-            }, 600); 
-        }
-    }, 3000); 
 });
