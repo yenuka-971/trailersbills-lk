@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 preloader.style.display = 'none';
             }, 600); 
-        }, 3000); // හරියටම තත්පර 3ක් පෙන්වයි
+        }, 3000); 
     }
     
     // =========================================
@@ -163,14 +163,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const trailer = document.getElementById('movieTrailer').value;
             const category = document.getElementById('movieCategory').value;
 
-            // සරලම විදිහට Trailer Object එක හදනවා (කිසිම අලුත් දෙයක් නෑ)
-            const newTrailer = { title, year, image, trailer, category };
+            // අලුතින් දාන ඒවට වර්තමාන වේලාව (Date.now) එකතු කරනවා
+            const newTrailer = { title, year, image, trailer, category, createdAt: Date.now() };
 
             const docId = await saveTrailerToFirebase(newTrailer);
 
             if (docId) {
-                // අලුත් එක යටින්ම පෙන්නයි, හැබැයි පරණ 20 බේරෙයි
-                addTrailerToUI(newTrailer, docId); 
+                // true කියන එකෙන් අලුත් ෆිල්ම් එකක් බව අඳුරගෙන ඒක උඩින්ම දානවා
+                addTrailerToUI(newTrailer, docId, true); 
                 alert('Trailer Added Successfully! 🎉');
                 addTrailerForm.reset(); 
             } else {
@@ -192,14 +192,32 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // මෙතන තමා වෙනස. කිසිම Sorting එකක් නැතුව, තියෙන දේවල් නිකන්ම ගන්නවා.
+    // මෙතන තමයි සේෆ් විදිහට Sorting කරන තැන
     async function loadTrailersFromFirebase() {
         try {
+            // කිසිම Sorting නීතියක් නැතුව Firebase එකෙන් ඔක්කොම ඩේටා ඉල්ලනවා
             const querySnapshot = await getDocs(collection(db, "trailers"));
             
+            let trailersArray = [];
+
+            // ආපු ඩේටා ටික Array එකකට දාගන්නවා
             querySnapshot.forEach((doc) => {
-                addTrailerToUI(doc.data(), doc.id);
+                let data = doc.data();
+                // පරණ 20ට "createdAt" නැති නිසා, ඒවට 0 දීලා අඩුවක් නැතිව තියාගන්නවා
+                if (!data.createdAt) {
+                    data.createdAt = 0;
+                }
+                trailersArray.push({ id: doc.id, data: data });
             });
+
+            // Browser එක ඇතුළෙදි වෙලාව අනුව පිළිවෙළ හදනවා (අලුත්ම ඒවා උඩට එන්න)
+            trailersArray.sort((a, b) => b.data.createdAt - a.data.createdAt);
+
+            // පිළිවෙළ හදපු ලිස්ට් එක පේජ් එකට දානවා
+            trailersArray.forEach((item) => {
+                addTrailerToUI(item.data, item.id, false);
+            });
+
         } catch (e) {
             console.error("Error loading trailers: ", e);
         }
@@ -237,7 +255,8 @@ document.addEventListener("DOMContentLoaded", function() {
         return videoId;
     }
 
-    function addTrailerToUI(trailer, docId) {
+    // අලුත් ට්‍රේලර් උඩින්ම දාන්න isNew පැරාමීටරය පාවිච්චි කරනවා
+    function addTrailerToUI(trailer, docId, isNew = false) {
         const dynamicTrailers = document.getElementById('dynamic-trailers');
         if (!dynamicTrailers) return;
 
@@ -268,8 +287,12 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
         
-        // හැම එකම පරණ විදිහට අගට එකතු වෙනවා
-        dynamicTrailers.append(colDiv);  
+        // අලුත් එකක් නම් (isNew = true) ලිස්ට් එකේ උඩින්ම (prepend) දානවා
+        if (isNew) {
+            dynamicTrailers.prepend(colDiv);
+        } else {
+            dynamicTrailers.append(colDiv); // අනිත් ඔක්කොම පිළිවෙළට යටින් එකතු වෙනවා
+        }
 
         // Delete Button ක්‍රියාකාරීත්වය
         const deleteBtn = colDiv.querySelector('.delete-btn');
