@@ -5,7 +5,7 @@ import {
     addDoc, 
     getDocs,
     deleteDoc, 
-    doc        
+    doc         
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ඔයාගේ Firebase Config එක
@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 3000); // 3000ms = හරියටම තත්පර 3ක් ලෝඩින් ස්ක්‍රීන් එක පෙන්වයි
     }
     
-    // ඔයාගේ පැරණි කෝඩ් එක (Category Filtering, Firebase Logic ආදිය) මෙතැන් සිට වෙනස් නොවී ක්‍රියාත්මක වේ...
     // =========================================
     // 1. CATEGORY FILTERING LOGIC
     // =========================================
@@ -163,140 +162,3 @@ document.addEventListener("DOMContentLoaded", function() {
     // =========================================
     // 5. ADD TRAILER TO FIREBASE (FORM SUBMIT)
     // =========================================
-    const addTrailerForm = document.getElementById('addTrailerForm');
-    
-    if (addTrailerForm) {
-        addTrailerForm.addEventListener('submit', async function(e) {
-            e.preventDefault(); 
-
-            // Form එකෙන් දත්ත ලබා ගැනීම (Category එකත් ඇතුලුව)
-            const title = document.getElementById('movieTitle').value;
-            const year = document.getElementById('movieYear').value;
-            const image = document.getElementById('movieImage').value;
-            const trailer = document.getElementById('movieTrailer').value;
-            const category = document.getElementById('movieCategory').value;
-
-            // දත්ත එකතු කිරීම
-            const newTrailer = { title, year, image, trailer, category };
-
-            // Firebase එකට යැවීම
-            const docId = await saveTrailerToFirebase(newTrailer);
-
-            if (docId) {
-                addTrailerToUI(newTrailer, docId);
-                alert('Trailer Added Successfully! 🎉');
-                addTrailerForm.reset(); // ෆෝම් එක Clear කිරීම
-            } else {
-                alert('දෝෂයක්! දත්ත එකතු කිරීමට නොහැකි විය.');
-            }
-        });
-    }
-
-    // =========================================
-    // 6. FIREBASE FUNCTIONS
-    // =========================================
-    async function saveTrailerToFirebase(trailer) {
-        try {
-            const docRef = await addDoc(collection(db, "trailers"), trailer);
-            return docRef.id; 
-        } catch (e) {
-            console.error("Error adding document: ", e);
-            return null;
-        }
-    }
-
-    async function loadTrailersFromFirebase() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "trailers"));
-            querySnapshot.forEach((doc) => {
-                addTrailerToUI(doc.data(), doc.id);
-            });
-        } catch (e) {
-            console.error("Error loading trailers: ", e);
-        }
-    }
-
-    async function deleteTrailerFromFirebase(docId, elementToRemove) {
-        const checkAdmin = sessionStorage.getItem('isAdmin') === 'true';
-        if (!checkAdmin) {
-            alert("අවසර නැත! මෙම ක්‍රියාව සිදුකළ හැක්කේ ඇඩ්මින්වරයෙකුට පමණි.");
-            return;
-        }
-
-        if (confirm("ඔබට විශ්වාසද මෙම ට්‍රේලර් එක මකා දැමිය යුතුයි කියා?")) {
-            try {
-                await deleteDoc(doc(db, "trailers", docId));
-                elementToRemove.remove(); 
-                alert("Trailer Deleted Successfully! 🗑️");
-            } catch (e) {
-                console.error("Error deleting document: ", e);
-                alert("මකා දැමීමේදී දෝෂයක් ඇතිවිය.");
-            }
-        }
-    }
-
-    // =========================================
-    // 7. YOUTUBE LINK EXTRACTION & UI UPDATE
-    // =========================================
-    function getYouTubeVideoId(url) {
-        let videoId = null;
-        const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-        const match = url.match(ytRegex);
-        if (match && match[1]) {
-            videoId = match[1];
-        }
-        return videoId;
-    }
-
-    function addTrailerToUI(trailer, docId) {
-        const dynamicTrailers = document.getElementById('dynamic-trailers');
-        if (!dynamicTrailers) return;
-
-        const colDiv = document.createElement('div');
-        colDiv.className = 'col-6 col-md-4 col-lg-3 dynamic-movie-card';
-        
-        // Category එක Set කිරීම (නැත්නම් 'Other' ලෙස දැමීම)
-        const movieCategory = trailer.category || 'Other'; 
-        colDiv.setAttribute('data-category', movieCategory);
-
-        const videoId = getYouTubeVideoId(trailer.trailer);
-        const targetLink = videoId ? `video.html?id=${videoId}` : trailer.trailer;
-
-        // UI එකට අදාල කෑල්ල (Category Badge එකත් එක්ක)
-        colDiv.innerHTML = `
-            <div class="movie-card-wrapper" style="position:relative;">
-                <button class="btn btn-danger btn-sm delete-btn" style="position:absolute; top:8px; right:8px; z-index:10; border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: bold; box-shadow: 0px 2px 5px rgba(0,0,0,0.5);">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-
-                <a href="${targetLink}" class="movie-card" target="_blank">
-                    <div class="year-badge">${trailer.year}</div>
-                    
-                    <!-- අලුත් Category Badge එක -->
-                    <div class="category-badge">${movieCategory}</div> 
-
-                    <div class="sub-badge">OFFICIAL TRAILER</div>
-                    <img src="${trailer.image}" alt="Movie Poster">
-                    <div class="movie-info">
-                        <h5 class="movie-title">${trailer.title}</h5>
-                    </div>
-                </a>
-            </div>
-        `;
-        
-        // අලුත් ෆිල්ම් එක මුලින්ම පෙන්වන්න prepend කිරීම
-        dynamicTrailers.prepend(colDiv);
-
-        // Delete Button ක්‍රියාකාරීත්වය
-        const deleteBtn = colDiv.querySelector('.delete-btn');
-        deleteBtn.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            e.stopPropagation(); 
-            deleteTrailerFromFirebase(docId, colDiv);
-        });
-    }
-
-    // අවසානයේ ෆිල්ම් ටික Firebase එකෙන් ලෝඩ් කිරීම පටන් ගන්නවා
-    loadTrailersFromFirebase();
-
-}); // මෙතනින් DOMContentLoaded එක ඉවර වෙනවා
