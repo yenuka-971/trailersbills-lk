@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrailersBliss LK - Watch Movie Trailers</title>
+    
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="custom-preloader">
-    <div class="preloader-content">
-        <div class="premium-spinner"></div>
-        <h1 class="preloader-logo">TrailersBliss <span class="accent-text">LK</span></h1>
+        <div class="preloader-content">
+            <div class="premium-spinner"></div>
+            <h1 class="preloader-logo">TrailersBliss <span class="accent-text">LK</span></h1>
+        </div>
     </div>
-</div>
+    
     <nav id="mainNavbar" class="navbar sticky-top">
         <div class="container d-flex align-items-center">
             
@@ -24,8 +28,9 @@
                 <span></span>
             </button>
 
-            <a class="navbar-brand fw-bold text-uppercase m-0" href="#home" style="color: #ffcc00 !important;">
-                🎬 TrailersBliss LK
+            <a class="navbar-brand fw-bold text-uppercase m-0 d-flex align-items-center" href="#home" style="color: #ffcc00 !important;">
+                <img src="logo.jpg" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+                TrailersBliss LK
             </a>
             
             <div class="theme-switch-wrapper ms-auto">
@@ -38,13 +43,14 @@
             
         </div>
     </nav>
+
     <section id="home" class="hero-section d-flex align-items-center text-center text-white">
         <div class="container">
             <h1 class="display-3 fw-bold mb-3" style="color: #ffcc00; text-shadow: 2px 2px 12px rgba(0,0,0,0.9);">Welcome to TrailersBliss LK</h1>
-<div class="search-container mt-3 mb-4" style="position: relative; max-width: 550px; margin: 0 auto; z-index: 50; width: 90%;">
-    <input type="text" id="movieSearchBox" placeholder="Search for movies, TV shows..." autocomplete="off">
-    <div id="searchSuggestions" class="search-suggestions-dropdown"></div>
-</div>
+            <div class="search-container mt-3 mb-4" style="position: relative; max-width: 550px; margin: 0 auto; z-index: 50; width: 90%;">
+                <input type="text" id="movieSearchBox" placeholder="Search for movies, TV shows..." autocomplete="off">
+                <div id="searchSuggestions" class="search-suggestions-dropdown"></div>
+            </div>
             <p class="lead mb-4" style="text-shadow: 1px 1px 6px rgba(0,0,0,0.9);">Your Gateway to the Cinematic Universe. Watch the Latest Movie Trailers Online.</p>
             <a href="#trailers" class="btn btn-warning btn-lg me-3 fw-bold text-dark">Watch Trailers</a>
             
@@ -53,12 +59,12 @@
             </a>
         </div>
     </section>
+
     <section id="trailers" class="py-5 services-section">
         <div class="container">
             <h2 class="text-start fw-bold mb-4 px-2 section-main-title">
                 <i class="fas fa-bolt" style="color: #ffcc00;"></i> LATEST TRAILERS
             </h2>
-            <!-- Category Filter Buttons (අලුතින් එකතු කළ කොටස) -->
             <div class="category-filters-container mb-4">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="Action">Action</button>
@@ -74,10 +80,12 @@
             </div>
         </div>
     </section>
+
     <div class="offcanvas offcanvas-start premium-sidebar" tabindex="-1" id="premiumSidebar" aria-labelledby="premiumSidebarLabel">
         <div class="offcanvas-header pt-4 pb-3 px-4">
             <h5 class="offcanvas-title fw-bold d-flex align-items-center" id="premiumSidebarLabel" style="color: #ffcc00; letter-spacing: 1px;">
-                <i class="fas fa-film me-2 fs-4"></i> TRAILERSBLISS
+                <img src="logo.jpg" alt="Logo" style="height: 28px; width: 28px; border-radius: 50%; margin-right: 10px; object-fit: cover;"> 
+                TRAILERSBLISS
             </h5>
             <button type="button" class="btn-close custom-close-btn" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
@@ -108,6 +116,7 @@
             </ul>
         </div>
     </div>
+
     <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background-color: #1a1a1a; color: #fff; border: 1px solid #333;">
@@ -135,6 +144,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="adminLoginModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background-color: #1a1a1a; color: #fff; border: 1px solid #333;">
@@ -153,6 +163,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="adminDashboardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content" style="background-color: #1a1a1a; color: #fff; border: 1px solid #ffcc00;">
@@ -181,22 +192,21 @@
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
-    <label class="form-label fw-bold">Category</label>
-    <select id="movieCategory" class="form-control bg-dark text-white border-secondary" required>
-        <option value="" disabled selected>Select Movie Category</option>
-        <option value="Action">Action</option>
-        <option value="Horror">Horror</option>
-        <option value="Animation">Animation</option>
-        <option value="Comedy">Comedy</option>
-        <option value="Drama">Drama</option>
-        <option value="TV Shows">TV Shows</option>
-        <option value="Mystery">Mystery</option>
-    </select>
-</div>
-
-<button type="submit" class="btn btn-success w-100 fw-bold">
-    <i class="fas fa-upload me-2"></i> Publish Trailer
-</button>
+                            <label class="form-label fw-bold">Category</label>
+                            <select id="movieCategory" class="form-control bg-dark text-white border-secondary" required>
+                                <option value="" disabled selected>Select Movie Category</option>
+                                <option value="Action">Action</option>
+                                <option value="Horror">Horror</option>
+                                <option value="Animation">Animation</option>
+                                <option value="Comedy">Comedy</option>
+                                <option value="Drama">Drama</option>
+                                <option value="TV Shows">TV Shows</option>
+                                <option value="Mystery">Mystery</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">
+                            <i class="fas fa-upload me-2"></i> Publish Trailer
+                        </button>
                     </form>
                 </div>
             </div>
