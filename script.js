@@ -8,7 +8,7 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ඔයාගේ Firebase Config එක
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDRPro7oeI4z3faIUGoqW_xLZGF2dH-PwA",
     authDomain: "trailersbliss.firebaseapp.com",
@@ -19,14 +19,40 @@ const firebaseConfig = {
     measurementId: "G-NSXBVWL28C"
 };
 
-// Firebase Initialize කිරීම
+// Firebase Initialize
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
    
-    // Global Array (සර්ච් එකට ෆිල්ම් ටික අල්ලගන්න)
+    // Global Array
     window.allTrailersData = [];
+
+    // =========================================
+    // FIREBASE CONNECTION TEST - NEW
+    // =========================================
+    async function testFirebaseConnection() {
+        try {
+            const testRef = collection(db, "trailers");
+            const snapshot = await getDocs(testRef);
+            console.log("✅ Firebase Connected! Total docs:", snapshot.size);
+            return true;
+        } catch (e) {
+            console.error("❌ Firebase Connection Failed:", e);
+            // Show error message to user
+            const container = document.getElementById('dynamic-trailers');
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-12 text-center">
+                        <h4 style="color: #ffcc00;">⚠️ Unable to load trailers</h4>
+                        <p style="color: #aaa;">Please check your internet connection and try again.</p>
+                        <small style="color: #666;">Error: ${e.message}</small>
+                    </div>
+                `;
+            }
+            return false;
+        }
+    }
 
     // =========================================
     // PREMIUM PRELOADER TIMER LOGIC
@@ -163,14 +189,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (docId) {
                 addTrailerToUI(newTrailer, docId, true);
-                
-                // අලුතින් දාන එකත් Search ලැයිස්තුවට එකතු කරනවා
                 window.allTrailersData.unshift({ id: docId, data: newTrailer });
-
                 alert('Trailer Added Successfully! 🎉');
                 addTrailerForm.reset(); 
             } else {
-                alert('දෝෂයක්! දත්ත එකතු කිරීමට නොහැකි විය.');
+                alert('Error! Could not add trailer.');
             }
         });
     }
@@ -190,46 +213,80 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function loadTrailersFromFirebase() {
         try {
+            // Test connection first
+            const connected = await testFirebaseConnection();
+            if (!connected) return;
+
             const querySnapshot = await getDocs(collection(db, "trailers"));
+            
+            // Check if collection is empty
+            if (querySnapshot.empty) {
+                console.warn("⚠️ No trailers found in Firebase!");
+                const container = document.getElementById('dynamic-trailers');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center">
+                            <h4 style="color: #ffcc00;">🎬 No Trailers Yet</h4>
+                            <p style="color: #aaa;">Be the first to add a trailer!</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
             let trailersArray = [];
 
             querySnapshot.forEach((doc) => {
                 let data = doc.data();
                 if (!data.createdAt) {
-                    data.createdAt = 0; // පරණ 20 සේෆ්!
+                    data.createdAt = 0;
                 }
                 trailersArray.push({ id: doc.id, data: data });
             });
 
             trailersArray.sort((a, b) => b.data.createdAt - a.data.createdAt);
-            window.allTrailersData = trailersArray; // Search එකට ඩේටා ටික දෙනවා
+            window.allTrailersData = trailersArray;
+
+            // Clear container before adding
+            const container = document.getElementById('dynamic-trailers');
+            if (container) container.innerHTML = '';
 
             trailersArray.forEach((item) => {
                 addTrailerToUI(item.data, item.id, false);
             });
+
+            console.log(`✅ Loaded ${trailersArray.length} trailers successfully!`);
+
         } catch (e) {
             console.error("Error loading trailers: ", e);
+            const container = document.getElementById('dynamic-trailers');
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-12 text-center">
+                        <h4 style="color: #ffcc00;">⚠️ Error Loading Trailers</h4>
+                        <p style="color: #aaa;">Please refresh the page or try again later.</p>
+                        <small style="color: #666;">Error: ${e.message}</small>
+                    </div>
+                `;
+            }
         }
     }
 
     async function deleteTrailerFromFirebase(docId, elementToRemove) {
         const checkAdmin = sessionStorage.getItem('isAdmin') === 'true';
         if (!checkAdmin) {
-            alert("අවසර නැත! මෙම ක්‍රියාව සිදුකළ හැක්කේ ඇඩ්මින්වරයෙකුට පමණි.");
+            alert("Access denied! Admin only.");
             return;
         }
-        if (confirm("ඔබට විශ්වාසද මෙම ට්‍රේලර් එක මකා දැමිය යුතුයි කියා?")) {
+        if (confirm("Are you sure you want to delete this trailer?")) {
             try {
                 await deleteDoc(doc(db, "trailers", docId));
                 elementToRemove.remove(); 
-                
-                // මැකුවම Search ලිස්ට් එකෙනුත් අයින් කරනවා
                 window.allTrailersData = window.allTrailersData.filter(item => item.id !== docId);
-
                 alert("Trailer Deleted Successfully! 🗑️");
             } catch (e) {
                 console.error("Error deleting document: ", e);
-                alert("මකා දැමීමේදී දෝෂයක් ඇතිවිය.");
+                alert("Error deleting trailer.");
             }
         }
     }
@@ -288,14 +345,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // =========================================
-    // 7. NEW SEARCH BAR LOGIC (LIVE SUGGESTIONS & ENTER KEY)
+    // 7. SEARCH BAR LOGIC
     // =========================================
     const searchBox = document.getElementById('movieSearchBox');
     const suggestionsBox = document.getElementById('searchSuggestions');
 
     if (searchBox && suggestionsBox) {
         
-        // අකුරක් ගහද්දි Live පින්තූරයයි නමයි එන කෑල්ල
         searchBox.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
             suggestionsBox.innerHTML = ''; 
@@ -305,7 +361,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // අකුරට ගැලපෙන ෆිල්ම් හොයනවා
             const matchedMovies = window.allTrailersData.filter(item =>
                 item.data.title.toLowerCase().includes(query)
             );
@@ -318,10 +373,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     const itemDiv = document.createElement('a');
                     itemDiv.href = targetLink;
-                    itemDiv.target = "_blank"; // අලුත් ටැබ් එකක ඕපන් වෙන්න
+                    itemDiv.target = "_blank";
                     itemDiv.className = 'search-suggestion-item';
                     
-                    // පින්තූරය සහ නම තීරුවක් විදිහට හැදෙනවා
                     itemDiv.innerHTML = `
                         <img src="${movie.data.image}" alt="${movie.data.title}">
                         <span>${movie.data.title}</span>
@@ -334,12 +388,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-        // Enter ඔබද්දි මුළු සයිට් එකේම ෆිල්ම් ෆිල්ටර් වෙන කෑල්ල
         searchBox.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const query = this.value.toLowerCase().trim();
-                suggestionsBox.style.display = 'none'; // Dropdown එක හංගනවා
+                suggestionsBox.style.display = 'none';
 
                 const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
                 let foundAny = false;
@@ -354,7 +407,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
 
-                // "All" Button එක Active කරනවා ෆිල්ටර් වෙද්දි Category අවුල් නොයන්න
                 const allFilterBtn = document.querySelector('.filter-btn[data-filter="all"]');
                 if(allFilterBtn) {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -363,7 +415,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-        // වෙන තැනක් ක්ලික් කරද්දි Dropdown එක හංගනවා
         document.addEventListener('click', function(e) {
             if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.style.display = 'none';
@@ -371,5 +422,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // =========================================
+    // LOAD TRAILERS FROM FIREBASE
+    // =========================================
     loadTrailersFromFirebase();
 });

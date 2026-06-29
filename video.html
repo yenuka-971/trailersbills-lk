@@ -48,6 +48,11 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(255, 204, 0, 0.6);
         }
+        .error-message {
+            color: #ffcc00;
+            text-align: center;
+            margin-top: 25%;
+        }
     </style>
 </head>
 <body>
@@ -55,20 +60,18 @@
     <div class="video-container" id="videoContainer">
         </div>
 
-    <a href="trailersbliss-lk.html" class="back-btn">⬅ Back to Home</a>
+    <!-- FIXED: back to index.html instead of trailersbliss-lk.html -->
+    <a href="index.html" class="back-btn">⬅ Back to Home</a>
 
     <script>
-        // 1. URL එකේ තියෙන වීඩියෝ ID එක අල්ලගන්නවා
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('id');
         const container = document.getElementById('videoContainer');
 
         if (videoId) {
-            // 2. ID එක තියෙනවා නම් යූටියුබ් ප්ලේයර් එක ඔටෝ ප්ලේ වෙන්න හදනවා (Mute කරලා)
             container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
         } else {
-            // ID එකක් නැත්නම් Error එකක් පෙන්වනවා
-            container.innerHTML = `<h3 style="text-align:center; margin-top: 25%; color: #ffcc00;">Video Not Found 😢</h3>`;
+            container.innerHTML = `<h3 class="error-message">🎬 Video Not Found 😢</h3>`;
         }
     </script>
 </body>
