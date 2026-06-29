@@ -1,4 +1,4 @@
-/* ROOT VARIABLES (LIGHT MODE LOOK) */
+/* ROOT VARIABLES (MUHLOVO WA NINXIKANISO) */
 :root {
     --bg-color: #f8f9fa;            
     --section-bg: #ffffff;          
@@ -11,7 +11,7 @@
     --card-shadow: rgba(0, 0, 0, 0.05);
 }
 
-/* DARK MODE LOOK (Best for Movie Sites) */
+/* MUHLOVO WA XINYAMI (Best for Movie Sites) */
 [data-theme="dark"] {
     --bg-color: #121212;            
     --section-bg: #1a1a1a;          
@@ -24,7 +24,6 @@
     --card-shadow: rgba(0, 0, 0, 0.4);
 }
 
-/* Base Styles */
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -38,13 +37,13 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Navbar Glassmorphism */
+/* Nyangwa wa le Henhla (Navbar) */
 .navbar {
     background-color: var(--nav-bg);
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    transition: background-color 0.4s ease-in-out, backdrop-filter 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
 }
 
 .navbar .navbar-brand, .navbar .navbar-nav .nav-link {
@@ -61,14 +60,19 @@ html {
     color: #ffcc00 !important; 
 }
 
-/* Hero Section */
+.navbar.scrolled {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(25px) saturate(200%) !important;
+}
+
+/* Xiyenge xa le Henhla (Hero Section) */
 .hero-section {
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
                 url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200') no-repeat center center/cover;
     height: 90vh;
 }
 
-/* Dynamic Sections */
+/* Swiyenge swa Ntirho (Sections) */
 .services-section {
     background-color: var(--section-bg);
     transition: background-color 0.3s ease;
@@ -79,7 +83,7 @@ html {
     border-left: 5px solid #ffcc00;
 }
 
-/* Movie/Trailer Button Custom Styles */
+/* Switirho swa Tibotoni (Buttons) */
 .btn-warning {
     background-color: #ffcc00 !important;
     border-color: #ffcc00 !important;
@@ -101,7 +105,7 @@ html {
     color: #000 !important;
 }
 
-/* Contact Form Dynamic Styles */
+/* Fomo yo Tihlanganise na Hina (Contact Form) */
 #contactForm {
     background-color: var(--card-bg) !important;
     color: var(--text-color) !important;
@@ -120,13 +124,12 @@ html {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Theme Toggle Button */
+/* Xitirho xo Cinca Muhlovo (Theme Toggle) */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
 }
 
-/* Theme Toggle Button එකේ ප්‍රධාන සැකිල්ල */
 .theme-btn {
     background-color: #1a1a1a;
     border-radius: 50px;
@@ -134,7 +137,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 8px; /* අයිකන් දෙක දෙපැත්තට ලස්සනට සෙට් වෙන්න padding හැදුවා */
+    padding: 0 8px;
     position: relative;
     height: 30px;
     width: 60px;
@@ -143,14 +146,12 @@ html {
     transition: background-color 0.3s ease;
 }
 
-/* ඇතුලේ තියෙන ඉර/හඳ අයිකන් */
 .theme-btn i {
     font-size: 14px;
     color: #ffcc00;
     z-index: 1;
 }
 
-/* කහ පාට බෝලේ (Ball) */
 .theme-btn .ball {
     background-color: #ffcc00;
     border-radius: 50%;
@@ -159,27 +160,20 @@ html {
     left: 2px;
     height: 22px;
     width: 22px;
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* ලස්සනට පැනලා යන Effect එක */
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     z-index: 2;
 }
 
-/* ===================================================
-   FIXED TOGGLE LOGIC (රාහුල ප්‍රොජෙක්ට් එක වෙනුවෙන් නිවැරදි කළ කොටස)
-   ===================================================
-*/
-
-/* Dark Mode එකේදී බෝලය වමට (0px) ගොස් ඉර වසා සඳ පෙන්වයි */
 [data-theme="dark"] .theme-btn .ball {
     transform: translateX(0px) !important;
 }
 
-/* Light Mode එකේදී බෝලය දකුණට (32px) ගොස් සඳ වසා ඉර පෙන්වයි */
 [data-theme="light"] .theme-btn .ball {
-    transform: translateX(32px) !important; /* බොත්තමේ පළල අනුව නූලටම සෙට් කර ඇත */
+    transform: translateX(32px) !important;
     background-color: #ff9800;
 }
 
-/* Premium Hamburger Menu Button */
+/* Nyangwa wa le Tlhelo (Premium Sidebar) */
 .premium-hamburger {
     display: flex;
     flex-direction: column;
@@ -200,7 +194,6 @@ html {
     transition: all 0.3s ease;
 }
 
-/* Premium Sidebar Menu */
 .premium-sidebar {
     background: rgba(10, 10, 10, 0.95) !important;
     backdrop-filter: blur(10px);
@@ -249,15 +242,7 @@ html {
     border-left: 4px solid #ffcc00;
 }
 
-/* Navbar Scroll Effect */
-.navbar.scrolled {
-    background-color: rgba(0, 0, 0, 0.1) !important;
-    backdrop-filter: blur(25px) saturate(200%) !important;
-}
-
-/* =========================================
-    MOVIE CARD STYLES
-========================================= */
+/* Khadi ra Filimi (Movie Card) */
 .movie-card {
     position: relative;
     display: block;
@@ -297,8 +282,8 @@ html {
 
 .sub-badge {
     position: absolute;
-    top: 95px; /* අකුරු දිග නිසා ටිකක් පහළට කළා */
-    left: -48px; /* අකුරු දිග නිසා ටිකක් වමට කළා */
+    top: 95px;
+    left: -48px;
     background-color: #ffcc00;
     color: #000;
     font-weight: 900;
@@ -333,73 +318,16 @@ html {
     text-transform: uppercase;
 }
 
-/* =========================================
-    ADMIN SYSTEM STYLES
-========================================= */
-#adminLoginModal .modal-content,
-#adminDashboardModal .modal-content {
-    box-shadow: 0 10px 30px rgba(255, 204, 0, 0.15);
-    border-radius: 12px;
-}
-
-#adminLoginModal .form-control:focus,
-#adminDashboardModal .form-control:focus {
-    border-color: #ffcc00 !important;
-    box-shadow: 0 0 0 0.25rem rgba(255, 204, 0, 0.25) !important;
-    background-color: #1f1f1f !important;
-}
-
-#loginError {
-    font-size: 14px;
-    font-weight: 600;
-    animation: shakeError 0.3s ease-in-out;
-}
-
-@keyframes shakeError {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
-}
-
-#addTrailerForm .form-label {
-    letter-spacing: 0.5px;
-    font-size: 14px;
-    color: #e0e0e0;
-}
-
-/* ===================================================
-   ROBUST DYNAMIC DELETE BUTTON SYSTEM (NEWLY INTEGRATED)
-=================================================== */
-.delete-btn {
-    display: none !important; /* සාමාන්‍ය පරිශීලකයින්ට සම්පූර්ණයෙන්ම සඟවයි */
-    transition: all 0.3s ease !important;
-    background-color: #dc3545 !important;
-    border: none !important;
-    cursor: pointer;
-    opacity: 0.9;
-}
-
-/* Body එකට admin-mode ක්ලාස් එක වැටුණු සැනින් සියලුම පරණ හා අලුත් කාඩ් වල බොත්තම පෙන්වයි */
-body.admin-mode .delete-btn {
-    display: block !important; 
-}
-
-.delete-btn:hover {
-    background-color: #a71d2a !important;
-    transform: scale(1.1) !important;
-    opacity: 1 !important;
-}/* =========================================
-   CATEGORY FILTER STYLES (NEW)
-========================================= */
+/* Swihlutelo swa Tixiyenge (Category Filters) */
 .category-filters-container {
     display: flex;
     gap: 10px;
     overflow-x: auto;
     padding-bottom: 10px;
-    /* Hide scrollbar for clean look */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 .category-filters-container::-webkit-scrollbar {
     display: none;
 }
@@ -429,7 +357,6 @@ body.admin-mode .delete-btn {
     box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
 }
 
-/* Category Badge on Movie Card */
 .category-badge {
     position: absolute;
     top: 8px;
@@ -443,94 +370,29 @@ body.admin-mode .delete-btn {
     font-size: 11px;
     z-index: 2;
     text-transform: uppercase;
-}/* ===================================================
-   PREMIUM PRELOADER SYSTEM (FOR RAHULA WEB TEAM PROJECT)
-=================================================== */
-#custom-preloader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: #0c0c0c; /* වීඩියෝ එකේ වගේම සිනමාටික් තද කළු පැහැය */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999; /* වෙබ් එකේ වෙන හැමදේකටම වඩා උඩින් තබා ගැනීමට */
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
 }
 
-/* තත්පර 3කට පසු සුමටව අතුරුදන් වීමට */
-#custom-preloader.fade-out {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.preloader-content {
-    text-align: center;
-}
-
-/* රන්වන් පැහැති කැරකෙන චක්‍රය (Premium Golden Spinner) */
-.premium-spinner {
-    width: 65px;
-    height: 65px;
-    border: 4px solid rgba(255, 204, 0, 0.1);
-    border-top: 4px solid #ffcc00; /* ඔයාගේ වෙබ් එකේ තීම් පාට (Gold) */
-    border-radius: 50%;
-    margin: 0 auto 25px auto;
-    animation: spinSmooth 1s linear infinite;
-    box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
-}
-
-/* මැද තියෙන අකුරු වල ස්ටයිල් එක */
-.preloader-logo {
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin: 0;
-    text-transform: uppercase;
-    animation: pulseText 2s ease-in-out infinite;
-}
-
-.preloader-logo .accent-text {
-    color: #ffcc00; /* LK කෑල්ල රන්වන් පාටින් පෙන්වීමට */
-}
-
-/* ඇනිමේෂන් ක්‍රියාත්මක වන ආකාරය (Keyframes) */
-@keyframes spinSmooth {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes pulseText {
-    0%, 100% { opacity: 0.8; transform: scale(0.98); }
-    50% { opacity: 1; transform: scale(1); }
-}/* ========================================= */
-/* PREMIUM SEARCH BAR STYLES                 */
-/* ========================================= */
+/* Bokisi ro Secha (Search Bar) */
 #movieSearchBox {
     width: 100%;
     padding: 14px 25px;
     font-size: 16px;
-    background-color: #000000 !important; /* ඇතුළ කළු */
-    color: #ffffff !important;            /* අකුරු සුදු */
-    border: 2px solid #ffffff;            /* වටේට සුදු රාමුව */
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff;
     border-radius: 30px;
     outline: none;
     transition: 0.3s ease-in-out;
 }
+
 #movieSearchBox::placeholder {
     color: #bbbbbb;
 }
+
 #movieSearchBox:focus {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* Search Suggestions Box (පින්තූරය සහ නම පෙන්වන තීරුව) */
 .search-suggestions-dropdown {
     position: absolute;
     top: 110%;
@@ -541,7 +403,7 @@ body.admin-mode .delete-btn {
     border-radius: 12px;
     max-height: 320px;
     overflow-y: auto;
-    display: none; /* මුලින් හැංගිලා තියෙන්නේ */
+    display: none;
     flex-direction: column;
     box-shadow: 0 10px 25px rgba(0,0,0,0.9);
 }
@@ -556,13 +418,16 @@ body.admin-mode .delete-btn {
     color: #ffffff;
     transition: background 0.2s;
 }
+
 .search-suggestion-item:last-child {
     border-bottom: none;
 }
+
 .search-suggestion-item:hover {
     background-color: #2a2a2a;
-    color: #ffc107; /* කහ පාට (Hover වෙද්දි) */
+    color: #ffc107;
 }
+
 .search-suggestion-item img {
     width: 45px;
     height: 65px;
@@ -570,7 +435,82 @@ body.admin-mode .delete-btn {
     border-radius: 6px;
     margin-right: 15px;
 }
+
 .search-suggestion-item span {
     font-size: 16px;
     font-weight: bold;
+}
+
+/* Mufambisi na Xitirho xo Khomela (Admin & Preloader) */
+.delete-btn {
+    display: none !important;
+    transition: all 0.3s ease !important;
+    background-color: #dc3545 !important;
+    border: none !important;
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+body.admin-mode .delete-btn {
+    display: block !important;
+}
+
+.delete-btn:hover {
+    background-color: #a71d2a !important;
+    transform: scale(1.1) !important;
+    opacity: 1 !important;
+}
+
+#custom-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #0c0c0c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+}
+
+#custom-preloader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.premium-spinner {
+    width: 65px;
+    height: 65px;
+    border: 4px solid rgba(255, 204, 0, 0.1);
+    border-top: 4px solid #ffcc00;
+    border-radius: 50%;
+    margin: 0 auto 25px auto;
+    animation: spinSmooth 1s linear infinite;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+}
+
+.preloader-logo {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+    animation: pulseText 2s ease-in-out infinite;
+}
+
+.preloader-logo .accent-text {
+    color: #ffcc00;
+}
+
+@keyframes spinSmooth {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseText {
+    0%, 100% { opacity: 0.8; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1); }
 }

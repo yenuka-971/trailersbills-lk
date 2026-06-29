@@ -1,14 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    getDocs,
-    deleteDoc, 
-    doc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Firebase Config
+// Tinhlamuselo ta Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDRPro7oeI4z3faIUGoqW_xLZGF2dH-PwA",
     authDomain: "trailersbliss.firebaseapp.com",
@@ -19,124 +12,79 @@ const firebaseConfig = {
     measurementId: "G-NSXBVWL28C"
 };
 
-// Firebase Initialize
+// Sungula Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
-   
-    // Global Array
     window.allTrailersData = [];
 
-    // =========================================
-    // FIREBASE CONNECTION TEST - NEW
-    // =========================================
+    // KAMBERA NXIHLANGANISO WA FIREBASE
     async function testFirebaseConnection() {
         try {
             const testRef = collection(db, "trailers");
-            const snapshot = await getDocs(testRef);
-            console.log("✅ Firebase Connected! Total docs:", snapshot.size);
+            await getDocs(testRef);
             return true;
         } catch (e) {
-            console.error("❌ Firebase Connection Failed:", e);
-            // Show error message to user
+            console.error("Firebase Connection Failed:", e);
             const container = document.getElementById('dynamic-trailers');
             if (container) {
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <h4 style="color: #ffcc00;">⚠️ Unable to load trailers</h4>
-                        <p style="color: #aaa;">Please check your internet connection and try again.</p>
-                        <small style="color: #666;">Error: ${e.message}</small>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-12 text-center"><h4 style="color: #ffcc00;">⚠️ Swi tsandzile ku nghenisa titrailer</h4><p style="color: #aaa;">Kambela inthaneti ya wena kumbe u tirhisa local server.</p></div>`;
             }
             return false;
         }
     }
 
-    // =========================================
-    // PREMIUM PRELOADER TIMER LOGIC
-    // =========================================
+    // XITIRHO XO KHOMELA (PRELOADER)
     const preloader = document.getElementById('custom-preloader');
     if (preloader) {
         setTimeout(() => {
             preloader.classList.add('fade-out');
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 600); 
-        }, 3000); 
+            setTimeout(() => preloader.style.display = 'none', 600); 
+        }, 1500);
     }
     
-    // =========================================
-    // 1. CATEGORY FILTERING LOGIC
-    // =========================================
+    // MAENDLELO YO HLUTA HI XIYENGE
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             filterBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-
             const selectedCategory = this.getAttribute('data-filter');
             const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
-            
             allMovieCards.forEach(card => {
-                if (selectedCategory === 'all') {
+                if (selectedCategory === 'all' || card.getAttribute('data-category') === selectedCategory) {
                     card.style.display = 'block';
                 } else {
-                    if (card.getAttribute('data-category') === selectedCategory) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = 'none';
                 }
             });
         });
     });
 
-   // =========================================
-    // 2. THEME & ADMIN MODE CHECK
-    // =========================================
-    if (sessionStorage.getItem('isAdmin') === 'true') {
-        document.body.classList.add('admin-mode');
-    }
+    // KAMBELA MUHLOVO & MFUMO WA MUFAMBISI
+    if (sessionStorage.getItem('isAdmin') === 'true') document.body.classList.add('admin-mode');
     
     const themeToggle = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement; 
-
-    if (!htmlElement.getAttribute('data-theme')) {
-        htmlElement.setAttribute('data-theme', 'dark'); 
-    }
+    if (!htmlElement.getAttribute('data-theme')) htmlElement.setAttribute('data-theme', 'dark'); 
 
     if (themeToggle) {
         themeToggle.addEventListener('click', function(e) {
             e.preventDefault(); 
             this.classList.toggle('active');
             let currentTheme = htmlElement.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
-                htmlElement.setAttribute('data-theme', 'light');
-            } else {
-                htmlElement.setAttribute('data-theme', 'dark');
-            }
+            htmlElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
         });
     }
 
-    // =========================================
-    // 3. NAVBAR SCROLL EFFECT
-    // =========================================
+    // MAENDLELO YA SCROLL EKA NAVBAR
     window.addEventListener('scroll', function() {
         const navbar = document.getElementById('mainNavbar');
-        if (navbar) {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        }
+        if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
     });
 
-    // =========================================
-    // 4. ADMIN LOGIN LOGIC
-    // =========================================
+    // MAENDLELO YO NGHENA YA MUFAMBISI
     const loginBtn = document.getElementById('loginBtn');
     const adminPasswordInput = document.getElementById('adminPassword');
     const loginError = document.getElementById('loginError');
@@ -144,26 +92,16 @@ document.addEventListener("DOMContentLoaded", function() {
     if (loginBtn) {
         loginBtn.addEventListener('click', function(e) {
             e.preventDefault(); 
-            const password = adminPasswordInput.value;
-            
-            if (password === 'adminyenuka') { 
+            if (adminPasswordInput.value === 'adminyenuka') { 
                 if(loginError) loginError.classList.add('d-none');
                 sessionStorage.setItem('isAdmin', 'true');
                 document.body.classList.add('admin-mode');
-                
                 const loginModalEl = document.getElementById('adminLoginModal');
-                if (loginModalEl) {
-                    const loginModal = bootstrap.Modal.getInstance(loginModalEl) || new bootstrap.Modal(loginModalEl);
-                    loginModal.hide();
-                }
-                if(adminPasswordInput) adminPasswordInput.value = '';
-
+                if (loginModalEl) bootstrap.Modal.getInstance(loginModalEl).hide();
+                adminPasswordInput.value = '';
                 setTimeout(() => {
                     const dashboardModalEl = document.getElementById('adminDashboardModal');
-                    if (dashboardModalEl) {
-                        const dashboardModal = bootstrap.Modal.getInstance(dashboardModalEl) || new bootstrap.Modal(dashboardModalEl);
-                        dashboardModal.show();
-                    }
+                    if (dashboardModalEl) new bootstrap.Modal(dashboardModalEl).show();
                 }, 400);
             } else {
                 if(loginError) loginError.classList.remove('d-none');
@@ -171,136 +109,50 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // =========================================
-    // 5. ADD TRAILER TO FIREBASE
-    // =========================================
+    // NGHENISA TRAILER EKA FIREBASE
     const addTrailerForm = document.getElementById('addTrailerForm');
     if (addTrailerForm) {
         addTrailerForm.addEventListener('submit', async function(e) {
             e.preventDefault(); 
-            const title = document.getElementById('movieTitle').value;
-            const year = document.getElementById('movieYear').value;
-            const image = document.getElementById('movieImage').value;
-            const trailer = document.getElementById('movieTrailer').value;
-            const category = document.getElementById('movieCategory').value;
-
-            const newTrailer = { title, year, image, trailer, category, createdAt: Date.now() };
-            const docId = await saveTrailerToFirebase(newTrailer);
-
-            if (docId) {
-                addTrailerToUI(newTrailer, docId, true);
-                window.allTrailersData.unshift({ id: docId, data: newTrailer });
-                alert('Trailer Added Successfully! 🎉');
+            const newTrailer = { 
+                title: document.getElementById('movieTitle').value, 
+                year: document.getElementById('movieYear').value, 
+                image: document.getElementById('movieImage').value, 
+                trailer: document.getElementById('movieTrailer').value, 
+                category: document.getElementById('movieCategory').value, 
+                createdAt: Date.now() 
+            };
+            try {
+                const docRef = await addDoc(collection(db, "trailers"), newTrailer);
+                addTrailerToUI(newTrailer, docRef.id, true);
+                window.allTrailersData.unshift({ id: docRef.id, data: newTrailer });
+                alert('Trailer yi nghenisiwile hi ku humelela! 🎉');
                 addTrailerForm.reset(); 
-            } else {
-                alert('Error! Could not add trailer.');
-            }
+            } catch (e) { alert('Xihoxo! Swi tsandzile ku nghenisa trailer.'); }
         });
     }
 
-    // =========================================
-    // 6. FIREBASE FUNCTIONS
-    // =========================================
-    async function saveTrailerToFirebase(trailer) {
-        try {
-            const docRef = await addDoc(collection(db, "trailers"), trailer);
-            return docRef.id; 
-        } catch (e) {
-            console.error("Error adding document: ", e);
-            return null;
-        }
-    }
-
-    async function loadTrailersFromFirebase() {
-        try {
-            // Test connection first
-            const connected = await testFirebaseConnection();
-            if (!connected) return;
-
-            const querySnapshot = await getDocs(collection(db, "trailers"));
-            
-            // Check if collection is empty
-            if (querySnapshot.empty) {
-                console.warn("⚠️ No trailers found in Firebase!");
-                const container = document.getElementById('dynamic-trailers');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="col-12 text-center">
-                            <h4 style="color: #ffcc00;">🎬 No Trailers Yet</h4>
-                            <p style="color: #aaa;">Be the first to add a trailer!</p>
-                        </div>
-                    `;
-                }
-                return;
-            }
-
-            let trailersArray = [];
-
-            querySnapshot.forEach((doc) => {
-                let data = doc.data();
-                if (!data.createdAt) {
-                    data.createdAt = 0;
-                }
-                trailersArray.push({ id: doc.id, data: data });
-            });
-
-            trailersArray.sort((a, b) => b.data.createdAt - a.data.createdAt);
-            window.allTrailersData = trailersArray;
-
-            // Clear container before adding
-            const container = document.getElementById('dynamic-trailers');
-            if (container) container.innerHTML = '';
-
-            trailersArray.forEach((item) => {
-                addTrailerToUI(item.data, item.id, false);
-            });
-
-            console.log(`✅ Loaded ${trailersArray.length} trailers successfully!`);
-
-        } catch (e) {
-            console.error("Error loading trailers: ", e);
-            const container = document.getElementById('dynamic-trailers');
-            if (container) {
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <h4 style="color: #ffcc00;">⚠️ Error Loading Trailers</h4>
-                        <p style="color: #aaa;">Please refresh the page or try again later.</p>
-                        <small style="color: #666;">Error: ${e.message}</small>
-                    </div>
-                `;
-            }
-        }
-    }
-
-    async function deleteTrailerFromFirebase(docId, elementToRemove) {
-        const checkAdmin = sessionStorage.getItem('isAdmin') === 'true';
-        if (!checkAdmin) {
-            alert("Access denied! Admin only.");
-            return;
-        }
-        if (confirm("Are you sure you want to delete this trailer?")) {
+    // SULA TRAILER
+    window.deleteTrailerFromFirebase = async function(docId, elementToRemove) {
+        if (sessionStorage.getItem('isAdmin') !== 'true') return alert("U nyimiwile! Leswi i swa Mufambisi ntsena.");
+        if (confirm("Xana u tiyisile leswaku u lava ku sula leyi trailer?")) {
             try {
                 await deleteDoc(doc(db, "trailers", docId));
                 elementToRemove.remove(); 
                 window.allTrailersData = window.allTrailersData.filter(item => item.id !== docId);
-                alert("Trailer Deleted Successfully! 🗑️");
-            } catch (e) {
-                console.error("Error deleting document: ", e);
-                alert("Error deleting trailer.");
-            }
+                alert("Trailer yi suriwile hi ku humelela! 🗑️");
+            } catch (e) { alert("Xihoxo xo sula trailer."); }
         }
     }
 
+    // MAENDLELO YO KUMA ID YA YOUTUBE
     function getYouTubeVideoId(url) {
-        let videoId = null;
-        const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-        const match = url.match(ytRegex);
-        if (match && match[1]) {
-            videoId = match[1];
-        }
-        return videoId;
+        if (!url || typeof url !== 'string') return null;
+        const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+        return (match && match[1]) ? match[1] : null;
     }
 
+    // KOMBISA TRAILER EKA SKRINI (UI)
     function addTrailerToUI(trailer, docId, isNew = false) {
         const dynamicTrailers = document.getElementById('dynamic-trailers');
         if (!dynamicTrailers) return;
@@ -311,76 +163,68 @@ document.addEventListener("DOMContentLoaded", function() {
         colDiv.setAttribute('data-category', movieCategory);
 
         const videoId = getYouTubeVideoId(trailer.trailer);
-        const targetLink = videoId ? `video.html?id=${videoId}` : trailer.trailer;
+        
+        // Cinca ku ya eka modal ya vhidiyo yo saseka
+        const linkAttr = videoId 
+            ? `href="#" data-bs-toggle="modal" data-bs-target="#videoModal" data-video-id="${videoId}"` 
+            : `href="${trailer.trailer || '#'}" target="_blank"`;
 
         colDiv.innerHTML = `
             <div class="movie-card-wrapper" style="position:relative;">
                 <button class="btn btn-danger btn-sm delete-btn" style="position:absolute; top:8px; right:8px; z-index:10; border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: bold; box-shadow: 0px 2px 5px rgba(0,0,0,0.5);">
-                    <i class="fas fa-trash"></i> Delete
+                    <i class="fas fa-trash"></i> Sula
                 </button>
-                <a href="${targetLink}" class="movie-card" target="_blank">
-                    <div class="year-badge">${trailer.year}</div>
+                <a ${linkAttr} class="movie-card">
+                    <div class="year-badge">${trailer.year || '2026'}</div>
                     <div class="category-badge">${movieCategory}</div> 
-                    <div class="sub-badge">OFFICIAL TRAILER</div>
-                    <img src="${trailer.image}" alt="Movie Poster">
+                    <div class="sub-badge">TRAILER YA XIMFUMO</div>
+                    <img src="${trailer.image || 'logo.jpg'}" alt="Phositara" loading="lazy">
                     <div class="movie-info">
-                        <h5 class="movie-title">${trailer.title}</h5>
+                        <h5 class="movie-title">${trailer.title || 'Filimi yo ka yi nga tiviwi'}</h5>
                     </div>
                 </a>
             </div>
         `;
         
-        if (isNew) {
-            dynamicTrailers.prepend(colDiv);
-        } else {
-            dynamicTrailers.append(colDiv); 
-        }
+        isNew ? dynamicTrailers.prepend(colDiv) : dynamicTrailers.append(colDiv); 
 
-        const deleteBtn = colDiv.querySelector('.delete-btn');
-        deleteBtn.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            e.stopPropagation(); 
-            deleteTrailerFromFirebase(docId, colDiv);
+        colDiv.querySelector('.delete-btn').addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation(); deleteTrailerFromFirebase(docId, colDiv);
         });
     }
 
-    // =========================================
-    // 7. SEARCH BAR LOGIC
-    // =========================================
+    // MAENDLELO YO SECHA
     const searchBox = document.getElementById('movieSearchBox');
     const suggestionsBox = document.getElementById('searchSuggestions');
 
     if (searchBox && suggestionsBox) {
-        
         searchBox.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
             suggestionsBox.innerHTML = ''; 
+            if (query === '') return suggestionsBox.style.display = 'none';
 
-            if (query === '') {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
-
-            const matchedMovies = window.allTrailersData.filter(item =>
-                item.data.title.toLowerCase().includes(query)
-            );
+            const matchedMovies = window.allTrailersData.filter(item => (item.data.title || '').toLowerCase().includes(query));
 
             if (matchedMovies.length > 0) {
                 suggestionsBox.style.display = 'flex';
                 matchedMovies.forEach(movie => {
                     const videoId = getYouTubeVideoId(movie.data.trailer);
-                    const targetLink = videoId ? `video.html?id=${videoId}` : movie.data.trailer;
-
                     const itemDiv = document.createElement('a');
-                    itemDiv.href = targetLink;
-                    itemDiv.target = "_blank";
                     itemDiv.className = 'search-suggestion-item';
                     
-                    itemDiv.innerHTML = `
-                        <img src="${movie.data.image}" alt="${movie.data.title}">
-                        <span>${movie.data.title}</span>
-                    `;
+                    if (videoId) {
+                        itemDiv.href = "#";
+                        itemDiv.setAttribute('data-bs-toggle', 'modal');
+                        itemDiv.setAttribute('data-bs-target', '#videoModal');
+                        itemDiv.setAttribute('data-video-id', videoId);
+                    } else {
+                        itemDiv.href = movie.data.trailer || "#";
+                        itemDiv.target = "_blank";
+                    }
                     
+                    itemDiv.innerHTML = `<img src="${movie.data.image || 'logo.jpg'}" alt="${movie.data.title}"><span>${movie.data.title || 'Xihundla'}</span>`;
+                    
+                    itemDiv.addEventListener('click', () => { suggestionsBox.style.display = 'none'; });
                     suggestionsBox.appendChild(itemDiv);
                 });
             } else {
@@ -388,42 +232,46 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-        searchBox.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = this.value.toLowerCase().trim();
-                suggestionsBox.style.display = 'none';
-
-                const allMovieCards = document.querySelectorAll('.dynamic-movie-card');
-                let foundAny = false;
-
-                allMovieCards.forEach(card => {
-                    const title = card.querySelector('.movie-title').textContent.toLowerCase();
-                    if (title.includes(query)) {
-                        card.style.display = 'block';
-                        foundAny = true;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                const allFilterBtn = document.querySelector('.filter-btn[data-filter="all"]');
-                if(allFilterBtn) {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    allFilterBtn.classList.add('active');
-                }
-            }
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.style.display = 'none';
-            }
+        document.addEventListener('click', (e) => {
+            if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) suggestionsBox.style.display = 'none';
         });
     }
 
-    // =========================================
-    // LOAD TRAILERS FROM FIREBASE
-    // =========================================
+    // MAENDLELO YA SKRINI XA VHIDIYO (PLAY/STOP)
+    const videoModal = document.getElementById('videoModal');
+    if (videoModal) {
+        videoModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const videoId = button.getAttribute('data-video-id');
+            const container = document.getElementById('videoModalContainer');
+            if (videoId) {
+                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            }
+        });
+        videoModal.addEventListener('hide.bs.modal', function () {
+            document.getElementById('videoModalContainer').innerHTML = ''; // Kuyimisa mpfumawulo loko u pfala
+        });
+    }
+
+    // KUMA VUXOKOXOKO EKA FIREBASE
+    async function loadTrailersFromFirebase() {
+        if (!(await testFirebaseConnection())) return;
+        try {
+            const snapshot = await getDocs(collection(db, "trailers"));
+            const container = document.getElementById('dynamic-trailers');
+            if (snapshot.empty) return container.innerHTML = `<div class="col-12 text-center"><h4 style="color: #ffcc00;">🎬 Ku hava titrailer ta ha ri kona</h4></div>`;
+            
+            let trailersArray = [];
+            snapshot.forEach(doc => trailersArray.push({ id: doc.id, data: doc.data() }));
+            trailersArray.sort((a, b) => (b.data.createdAt || 0) - (a.data.createdAt || 0));
+            window.allTrailersData = trailersArray;
+            
+            if (container) container.innerHTML = '';
+            trailersArray.forEach(item => addTrailerToUI(item.data, item.id, false));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     loadTrailersFromFirebase();
 });
