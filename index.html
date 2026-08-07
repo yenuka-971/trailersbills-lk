@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta name="google-site-verification" content="Odvzf6-6n9zwhV0zeTDxm7rIChYtOWamajbIOSsm5sM" />
+    <meta name="google-site-verification" content="Odvzf6-6n9zwhV0zeTDxm7rIChYtOWamajbIOSsm5sM" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrailersBliss LK - Watch Movie Trailers</title>
-    
+
     <link rel="icon" type="image/jpeg" href="logo.jpg">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,10 +19,10 @@
             <h1 class="preloader-logo">TrailersBliss <span class="accent-text">LK</span></h1>
         </div>
     </div>
-    
+
     <nav id="mainNavbar" class="navbar sticky-top">
         <div class="container d-flex align-items-center">
-            
+
             <button class="premium-hamburger border-0 bg-transparent me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#premiumSidebar" aria-controls="premiumSidebar">
                 <span></span>
                 <span></span>
@@ -33,7 +33,7 @@
                 <img src="logo.jpg" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
                 TrailersBliss LK
             </a>
-            
+
             <div class="theme-switch-wrapper ms-auto">
                 <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
                     <i class="fas fa-sun"></i>
@@ -41,7 +41,7 @@
                     <span class="ball"></span>
                 </button>
             </div>
-            
+
         </div>
     </nav>
 
@@ -54,7 +54,7 @@
             </div>
             <p class="lead mb-4" style="text-shadow: 1px 1px 6px rgba(0,0,0,0.9);">Your Gateway to the Cinematic Universe. Watch the Latest Movie Trailers Online.</p>
             <a href="#trailers" class="btn btn-warning btn-lg me-3 fw-bold text-dark">Watch Trailers</a>
-            
+
             <a href="https://whatsapp.com/channel/0029Vb7RSiPC1Fu40vuNrs1h" target="_blank" class="btn btn-outline-warning btn-lg fw-bold">
                 <i class="fab fa-whatsapp me-2"></i>Join Community
             </a>
@@ -77,7 +77,7 @@
                 <button class="filter-btn" data-filter="Mystery">Mystery</button>
             </div>
             <div class="row g-3" id="dynamic-trailers">
-                
+
             </div>
         </div>
     </section>
@@ -85,12 +85,12 @@
     <div class="offcanvas offcanvas-start premium-sidebar" tabindex="-1" id="premiumSidebar" aria-labelledby="premiumSidebarLabel">
         <div class="offcanvas-header pt-4 pb-3 px-4">
             <h5 class="offcanvas-title fw-bold d-flex align-items-center" id="premiumSidebarLabel" style="color: #ffcc00; letter-spacing: 1px;">
-                <img src="logo.jpg" alt="Logo" style="height: 28px; width: 28px; border-radius: 50%; margin-right: 10px; object-fit: cover;"> 
+                <img src="logo.jpg" alt="Logo" style="height: 28px; width: 28px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
                 TRAILERSBLISS
             </h5>
             <button type="button" class="btn-close custom-close-btn" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        
+
         <div class="offcanvas-body px-4 d-flex flex-column">
             <ul class="navbar-nav flex-column gap-3 mt-3">
                 <li class="nav-item">
@@ -108,14 +108,14 @@
                 <li class="nav-item">
                     <a class="nav-link premium-link" href="#" data-bs-toggle="modal" data-bs-target="#contactModal" data-bs-dismiss="offcanvas"><i class="fas fa-envelope"></i> <span>Contact Us</span></a>
                 </li>
-                
+
                 <li class="nav-item mt-4 border-top border-secondary pt-3">
                     <a class="nav-link premium-link text-warning" href="#" data-bs-toggle="modal" data-bs-target="#adminLoginModal" data-bs-dismiss="offcanvas">
                         <i class="fas fa-lock"></i> <span>Admin Login</span>
                     </a>
                 </li>
             </ul>
-            
+
             <div class="mt-auto pt-4 pb-2 text-center" style="color: #a0a0a0; font-size: 14px; letter-spacing: 0.5px;">
                 &copy; Copyright 2026 by Shanaka D
             </div>
@@ -217,7 +217,24 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="script.js"></script>
+
+    <!-- Video Player Modal (kept for reference, but movie cards now use video.html) -->
+    <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="background-color: #000; border: 2px solid #ffcc00;">
+                <div class="modal-header border-bottom-0">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="videoModalContainer" style="width:100%; height:500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script type="module" src="script.js">
+    </script>
 </body>
 </html>
